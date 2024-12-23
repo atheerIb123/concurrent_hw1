@@ -1,7 +1,7 @@
 import numpy as np
 from numba import njit, cuda, prange
 import timeit
-
+import math
 
 def matmul_transpose_trivial(X):
     rows = len(X)
@@ -32,9 +32,6 @@ def matmul_transpose_numba(X):
     return result
 
 def matmul_transpose_gpu(X):
-    """
-    GPU-based matrix multiplication where the second matrix is the transpose of the first.
-    """
     rows, cols = X.shape
     result = np.zeros((rows, rows), dtype=np.float32)
 
@@ -42,31 +39,27 @@ def matmul_transpose_gpu(X):
     d_result = cuda.to_device(result)
 
     threads_per_block = 1024
-    total_elements = rows * rows
-    blocks_per_grid = (total_elements + threads_per_block - 1) // threads_per_block
+    blocks_per_grid = 1  
 
-    matmul_kernel[blocks_per_grid, threads_per_block](d_X, d_result, cols)
+    matmul_kernel[blocks_per_grid, threads_per_block](d_X, d_result, cols, rows)
 
     return d_result.copy_to_host()
 
 
 @cuda.jit
-def matmul_kernel(A, C, cols):
-    """
-    Kernel function for matrix multiplication with transpose.
-    """
-    thread_id = cuda.threadIdx.x + cuda.blockIdx.x * cuda.blockDim.x
+def matmul_kernel(A, C, cols, rows):
+    thread_id = cuda.threadIdx.x  
+    total_elements = rows * rows  
 
-    total_elements = C.shape[0] * C.shape[1]
-    if thread_id < total_elements:
-        row_index = thread_id // C.shape[1]
-        col_index = thread_id % C.shape[1]
+    for idx in range(thread_id, total_elements, 1024):  
+        row = idx // rows
+        col = idx % rows
 
-        temp_sum = 0.0
-        for k in range(cols):
-            temp_sum += A[row_index, k] * A[col_index, k]
-
-        C[row_index, col_index] = temp_sum
+        if row < rows and col < rows:
+            temp_sum = 0.0
+            for k in range(cols):
+                temp_sum += A[row, k] * A[col, k]
+            C[row, col] = temp_sum
 
 def verify_solution():
     X = np.random.randn(784, 128)
