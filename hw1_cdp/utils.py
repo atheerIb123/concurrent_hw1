@@ -1,6 +1,5 @@
 import numpy as np
 
-
 def sigmoid(x):
     """
      Parameters
@@ -13,7 +12,6 @@ def sigmoid(x):
          sigmoid of the input x
      """
     return 1 / (1 + np.exp(-x))
-
 
 def sigmoid_prime(x):
     """
@@ -28,7 +26,6 @@ def sigmoid_prime(x):
     """
     return sigmoid(x) * (1 - sigmoid(x))
 
-
 def random_weights(sizes):
     """
     Parameters
@@ -42,8 +39,6 @@ def random_weights(sizes):
     res = [xavier_initialization(sizes[i], sizes[i+1]) for i in range(len(sizes)-1)]
     return res
 
-
-
 def zeros_weights(sizes):
     """
     Parameters
@@ -56,8 +51,6 @@ def zeros_weights(sizes):
     """
     return [np.zeros((sizes[i], sizes[i+1])) for i in range(len(sizes)-1)]
 
-
-
 def zeros_biases(sizes):
     """
     Parameters
@@ -69,7 +62,6 @@ def zeros_biases(sizes):
     list of zero np arrays bias matrices
     """
     return [np.zeros((1, sizes[i])) for i in range(len(sizes))]
-
 
 def create_batches(data, labels, batch_size):
     """
@@ -97,7 +89,6 @@ def add_elementwise(list1, list2):
     list of sum of each two elements by index
     """
     return [x + y for x, y in zip(list1, list2)]
-
 
 def xavier_initialization(m, n):
     xavier = 1 / (m ** 0.5)
