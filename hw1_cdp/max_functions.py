@@ -47,7 +47,7 @@ def max_gpu(A, B):
     d_B = cuda.to_device(B)
     d_C = cuda.device_array((rows, cols), dtype=A.dtype)
 
-    block_size = (32, 32)
+    block_size = (20, 50)
     grid_size = ((rows + block_size[0] - 1) // block_size[0],
                  (cols + block_size[1] - 1) // block_size[1])
 
